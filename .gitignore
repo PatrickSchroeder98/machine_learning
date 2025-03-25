@@ -1,0 +1,4 @@
+/.idea
+/.venv
+*/__pycache__
+USA_Housing.csv
