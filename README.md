@@ -13,3 +13,7 @@ Each program is placed in a folder. Name of a folder shows, what kind of topic h
 ## Technologies Used
 
 - Python programming language
+- Pandas library
+- Seaborn library
+- Matplotlib library
+- Sklearn library

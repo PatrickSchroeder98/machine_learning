@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix
 
 df = pd.read_csv("titanic_train.csv")
-
-#print(df.head())
 
 # Data exploration
 
@@ -43,8 +44,8 @@ plt.show()
 # Fixing missing data
 def impute_age(cols):
     """Function that fills the missing age numbers based on average values from one of 3 classes. """
-    age = cols[0]
-    pclass = cols[1]
+    age = cols.iloc[0]
+    pclass = cols.iloc[1]
 
     if pd.isnull(age):
         if pclass == 1:
@@ -78,5 +79,15 @@ train.drop('PassengerId', axis=1, inplace=True)
 
 print(train.head())  # Data has been prepared for ML operations
 
+# Logistic regression
+X = train.drop('Survived', axis=1)
+y = train['Survived']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=101)
 
-# TODO update README
+logmodel = LogisticRegression(max_iter=1000)
+logmodel.fit(X_train, y_train)
+
+predictions = logmodel.predict(X_test)
+
+print(classification_report(y_test, predictions))
+print(confusion_matrix(y_test, predictions))
