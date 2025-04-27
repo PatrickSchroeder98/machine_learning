@@ -14,7 +14,7 @@ from sklearn.datasets import fetch_california_housing
 housing = fetch_california_housing()
 
 lm = LinearRegression()
-df = pd.read_csv('USA_Housing.csv')
+df = pd.read_csv("USA_Housing.csv")
 
 # Data columns (total 7 columns):
 #  #   Column                        Non-Null Count  Dtype
@@ -31,7 +31,7 @@ df = pd.read_csv('USA_Housing.csv')
 sns.pairplot(df)
 plt.show()
 
-sns.displot(df['Price'])
+sns.displot(df["Price"])
 plt.show()
 
 # print(df.columns)
@@ -44,27 +44,36 @@ plt.show()
 
 # plt.show()
 
-X = df[['Avg. Area Income', 'Avg. Area House Age', 'Avg. Area Number of Rooms',
-        'Avg. Area Number of Bedrooms', 'Area Population']]
+X = df[
+    [
+        "Avg. Area Income",
+        "Avg. Area House Age",
+        "Avg. Area Number of Rooms",
+        "Avg. Area Number of Bedrooms",
+        "Area Population",
+    ]
+]
 
-y = df[['Price']]
+y = df[["Price"]]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=101)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.4, random_state=101
+)
 lm.fit(X_train, y_train)
 print(lm.intercept_)
 print(lm.coef_)
 
-cdf = pd.DataFrame(lm.coef_.T, X.columns, columns=['Coeff'])
+cdf = pd.DataFrame(lm.coef_.T, X.columns, columns=["Coeff"])
 print(cdf)
 
-#print(housing.keys())
+# print(housing.keys())
 
 predictions = lm.predict(X_test)
 
 plt.scatter(y_test, predictions)
 plt.show()
 
-sns.displot((y_test-predictions))
+sns.displot((y_test - predictions))
 plt.show()
 
 m1 = metrics.mean_absolute_error(y_test, predictions)
