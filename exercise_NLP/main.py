@@ -5,6 +5,11 @@ import seaborn as sns
 import string
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
 
 # nltk.download()
 
@@ -68,3 +73,42 @@ print(bow4.shape)
 
 print(bow_transformer.get_feature_names_out()[4068])
 print(bow_transformer.get_feature_names_out()[9554])
+
+messages_bow = bow_transformer.transform(messages['message'])
+print('Shape of Sparse Matrix: ', messages_bow.shape)
+print('Amount of Non-Zero occurences: ', messages_bow.nnz)
+sparsity = (100.0 * messages_bow.nnz / (messages_bow.shape[0] * messages_bow.shape[1]))
+print('sparsity: {}'.format(sparsity))
+
+tfidf_transformer = TfidfTransformer().fit(messages_bow)
+tfidf4 = tfidf_transformer.transform(bow4)
+print(tfidf4)
+
+messages_tfidf = tfidf_transformer.transform(messages_bow)
+print(messages_tfidf.shape)
+
+spam_detect_model = MultinomialNB().fit(messages_tfidf, messages['label'])
+print('predicted:', spam_detect_model.predict(tfidf4)[0])
+print('expected:', messages.label[3])
+
+all_predictions = spam_detect_model.predict(messages_tfidf)
+print(all_predictions)
+# For model trained on all data
+print (classification_report(messages['label'], all_predictions))
+
+# Training model on split data
+msg_train, msg_test, label_train, label_test = \
+train_test_split(messages['message'], messages['label'], test_size=0.2)
+
+print(len(msg_train), len(msg_test), len(msg_train) + len(msg_test))
+
+pipeline = Pipeline([
+    ('bow', CountVectorizer(analyzer=text_process)),  # strings to token integer counts
+    ('tfidf', TfidfTransformer()),  # integer counts to weighted TF-IDF scores
+    ('classifier', MultinomialNB()),  # train on TF-IDF vectors w/ Naive Bayes classifier
+])
+
+pipeline.fit(msg_train,label_train)
+predictions = pipeline.predict(msg_test)
+
+print(classification_report(predictions,label_test))
